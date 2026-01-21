@@ -22,14 +22,15 @@ jobs:
         
     - name: 📦 Dependencies
       shell: powershell
-      run: pip install -r requirements.txt
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
         
-    - name: 🚀 RUN BEHAVE + HTML
+    - name: 🚀 BEHAVE + HTML Report
       env:
         HEADLESS: true
       shell: powershell
-      run: |
-        behave -f html -o report.html
+      run: behave -f html -o report.html
         
     - name: 📊 Upload Report
       uses: actions/upload-artifact@v4
