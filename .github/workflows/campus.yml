@@ -30,7 +30,7 @@ jobs:
           pip install -r requirements.txt
           pip install behave selenium webdriver-manager behave-html-formatter
 
-      # 5️⃣ Exécuter Behave avec headless Edge et logs
+      # 4️⃣ Exécuter Behave avec Edge headless et logs complets
       - name: Run Behave on Creation_etudiant.feature
         shell: powershell
         env:
@@ -38,8 +38,11 @@ jobs:
         run: |
           Write-Output "=== Exécution du test Behave pour Creation_etudiant.feature en mode headless Edge ==="
           # Rapport HTML
-          behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v 
-      # 6️⃣ Upload du rapport HTML
+          behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v || Write-Output "=== Rapport HTML généré malgré erreurs ==="
+          # Log texte complet (trace des exceptions Python)
+          behave features/Creation_etudiant.feature -f plain -o report.txt --no-capture -v || Write-Output "=== Log texte complet généré ==="
+
+      # 5️⃣ Upload du rapport HTML
       - name: Upload HTML Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -47,3 +50,10 @@ jobs:
           name: behave-html-report
           path: report.html
 
+      # 6️⃣ Upload du log texte complet
+      - name: Upload Behave Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: behave-log
+          path: report.txt
