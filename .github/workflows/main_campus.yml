@@ -27,11 +27,15 @@ jobs:
         HEADLESS: true
       shell: powershell
       run: |
-        # DEBUG : Vérifier structure
+        echo "=== STRUCTURE ==="
         dir
-        dir features\*.feature
-        # Lancer avec verbose
-        behave --verbose -f html -o report.html
+        dir features
+        dir features\steps
+        dir features\steps\*.py
+        echo "=== FIN DEBUG ==="
+        
+        # Lancer tests
+        behave -f html -o report.html
         
     - uses: actions/upload-artifact@v4
       with:
