@@ -1,0 +1,7 @@
+Feature: Creation de compte Campus France
+
+  Scenario: Creation d un compte Etudiant
+    Given je suis sur la page de creation de compte ... passed in 6.334s
+    When je saisi les informations utilisateur ... passed in 11.713s
+    Then je ferme le navigateur ... passed in 2.186s
+

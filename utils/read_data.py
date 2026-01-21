@@ -1,10 +1,17 @@
+import os
 import json
 from models.etudiant import Etudiant
 
 class ReadData:
 
     def read_data_from_json(self):
-        filename = "C:\\Users\\User\\Desktop\\Campus_Python\\data\\etudiant.json"
+        # Chemin relatif au projet, peu importe où il est cloné
+        base_dir = os.path.dirname(os.path.dirname(__file__))  # remonte de utils/ à la racine du repo
+        filename = os.path.join(base_dir, "data", "etudiant.json")
+
+        # Vérifier que le fichier existe
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Le fichier {filename} est introuvable !")
 
         with open(filename, "r", encoding="utf-8") as file:
             data = json.load(file)
