@@ -37,15 +37,17 @@ jobs:
           Write-Output "Structure du projet :"
           Get-ChildItem -Recurse
 
-      # 5️⃣ Lancer Behave sur Creation_etudiant.feature avec headless + HTML report
+      # 5️⃣ Exécuter Behave avec headless Edge et logs
       - name: Run Behave on Creation_etudiant.feature
         shell: powershell
         env:
           HEADLESS: true
         run: |
-          Write-Output "Exécution du test Behave pour Creation_etudiant.feature en mode headless"
-          behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v
-
+          Write-Output "=== Exécution du test Behave pour Creation_etudiant.feature en mode headless Edge ==="
+          # Rapport HTML
+          behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v 
+          # Log texte complet
+          behave features/Creation_etudiant.feature -f plain -o report.txt --no-capture -v 
       # 6️⃣ Upload du rapport HTML
       - name: Upload HTML Report
         if: always()
@@ -53,3 +55,11 @@ jobs:
         with:
           name: behave-html-report
           path: report.html
+
+      # 7️⃣ Upload du log texte
+      - name: Upload Behave Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: behave-log
+          path: report.txt
