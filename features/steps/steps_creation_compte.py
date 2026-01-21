@@ -1,5 +1,7 @@
 import time
+import sys
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from selenium.webdriver.edge.options import Options
 from behave import given, when, then
 from selenium import webdriver
