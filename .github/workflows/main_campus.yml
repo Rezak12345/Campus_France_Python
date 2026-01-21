@@ -1,4 +1,4 @@
-name: Test Automation - Campus France (Windows)
+name: Selenium / Behave Tests (Windows)
 
 on:
   push:
@@ -7,15 +7,15 @@ on:
     branches: [main]
 
 jobs:
-  behave-tests:
+  test:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout du code
+      # 1️⃣ Récupérer le dépôt
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
+      # 2️⃣ Installer Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -27,21 +27,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium behave
 
-      # 4️⃣ Installer Microsoft Edge (stable) + WebDriver
-      - name: Install Microsoft Edge
-        uses: microsoft/setup-msedge@v1
+      # 4️⃣ Installer Microsoft Edge Browser
+      - name: Setup Edge Browser
+        uses: browser-actions/setup-edge@v1
         with:
-          edge-version: latest
+          edge-version: "stable"
 
-      # 5️⃣ Lancer les tests Behave
-      - name: Run Behave tests
+      # 5️⃣ Installer Edge WebDriver (msedgedriver)
+      - name: Setup Edge WebDriver
+        uses: browser-actions/setup-edge@v1
+        with:
+          edge-version: "stable"
+
+      # 6️⃣ Exécuter les tests Behave + créer rapport HTML
+      - name: Run Behave Tests
         run: |
           mkdir reports
           behave -f html -o reports/report.html
 
-      # 6️⃣ Publier le rapport HTML comme artefact
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+      # 7️⃣ Upload du rapport HTML en tant qu'artefact
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
         with:
           name: behave-html-report
           path: reports/report.html
