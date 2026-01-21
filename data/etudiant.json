@@ -1,0 +1,16 @@
+{
+  "email": "marie.dupont@test.com",
+  "motDePasse": "Password123!",
+  "confirmationMotDePasse": "Password123!",
+  "civilite": "Madame",
+  "nom": "Dupont",
+  "prenom": "Marie",
+  "paysResidence": "France",
+  "paysNationalite": "France",
+  "codePostal": "75001",
+  "ville": "Paris",
+  "telephone": "0612345678",
+  "profil": "Étudiants",
+  "domaineActivite": "Informatique",
+  "niveauEtude": "Licence 1"
+}
