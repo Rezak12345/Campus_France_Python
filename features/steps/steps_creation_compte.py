@@ -1,5 +1,6 @@
-import os
 import time
+import os
+from selenium.webdriver.edge.options import Options
 from behave import given, when, then
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,22 +12,24 @@ def step_given_page_creation(context):
     context.read = ReadData()
     context.etudiant = context.read.read_data_from_json()
 
-    options = webdriver.EdgeOptions()
-    options.use_chromium = True
+    # 🔧 DETECTION HEADLESS AUTO
+    headless = os.getenv('HEADLESS') == 'true' or 'GITHUB_ACTIONS' in os.environ
 
-    # Détection GitHub Actions
-    is_ci = os.getenv("GITHUB_ACTIONS") == "true"
+    # Configuration Edge
+    edge_options = Options()
 
-    if is_ci:
-        print("▶ GitHub Actions détecté → mode HEADLESS")
-        options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--window-size=1920,1080")
+    if headless:
+        print("🖥️ Mode HEADLESS (GitHub Actions)")
+        edge_options.add_argument('--headless')
+        edge_options.add_argument('--no-sandbox')
+        edge_options.add_argument('--disable-dev-shm-usage')
+        edge_options.add_argument('--disable-gpu')
+        edge_options.add_argument('--window-size=1920,1080')
     else:
-        print("▶ Exécution locale → mode graphique")
+        print("🖥️ Mode GRAPHIQUE (local)")
 
-    context.driver = webdriver.Edge(options=options)
+    # Initialisation driver
+    context.driver = webdriver.Edge(options=edge_options)
     context.js = context.driver
 
     context.driver.get("https://www.campusfrance.org/fr/user/register")
@@ -88,36 +91,62 @@ def step_when_saisie_infos(context):
     )
     driver.find_element(By.XPATH, "//*[@id=\"edit-field-publics-cibles\"]/div[1]/label").click()
 
-    # Domaine étude
-    driver.find_element(By.XPATH,
-        "//*[@id=\"edit-field-domaine-etudes-wrapper\"]/div/div/div[1]/div"
-    ).click()
+    # Domaine étude - VERSION ROBUSTE avec scroll + wait
+    print("🎓 Sélection Domaine d'études...")
+    time.sleep(1)
+
+    # Ouvrir dropdown domaine
+    driver.find_element(By.XPATH, "//*[@id=\"edit-field-domaine-etudes-wrapper\"]/div/div/div[1]/div").click()
+    time.sleep(1)  # Attendre ouverture dropdown
+
+    # Scroll vers section "Médecine" + sélection
     medcine = driver.find_element(By.XPATH,
-        "/html/body/div[2]/div[2]/main/div[2]/div/div[2]/form/div[4]/div[2]/div[1]/div/div/div[2]/div/div[17]"
-    )
+                                  "/html/body/div[2]/div[2]/main/div[2]/div/div[2]/form/div[4]/div[2]/div[1]/div/div/div[2]/div/div[17]")
+    js.execute_script("arguments[0].scrollIntoView({block: 'center'});", medcine)
+    time.sleep(0.5)
     js.execute_script("arguments[0].parentElement.scrollTop = arguments[0].offsetTop;", medcine)
+    time.sleep(0.5)
     medcine.click()
+    print("✅ Médecine sélectionné")
+    time.sleep(1)
 
-    # Niveau étude
-    js.execute_script(
-        "arguments[0].scrollIntoView(true);",
-        driver.find_element(By.XPATH, "//*[@id=\"edit-field-domaine-etudes-wrapper\"]/div/label")
-    )
-    driver.find_element(By.XPATH,
-        "//*[@id=\"edit-field-niveaux-etude-wrapper\"]/div/div/div[1]/div"
-    ).click()
+    # Niveau étude - VERSION ROBUSTE avec scroll + wait
+    print("📚 Sélection Niveau d'études...")
+    time.sleep(1)
+
+    # Scroll vers section Niveau + ouvrir dropdown
+    js.execute_script("arguments[0].scrollIntoView({block: 'center'});",
+                      driver.find_element(By.XPATH, "//*[@id=\"edit-field-domaine-etudes-wrapper\"]/div/label"))
+    time.sleep(1)
+
+    driver.find_element(By.XPATH, "//*[@id=\"edit-field-niveaux-etude-wrapper\"]/div/div/div[1]/div").click()
+    time.sleep(1.5)  # Dropdowns Select2 ont besoin de + de temps
+
+    # Scroll vers "Master" + sélection
     master = driver.find_element(By.XPATH,
-        "/html/body/div[2]/div[2]/main/div[2]/div/div[2]/form/div[4]/div[2]/div[2]/div/div/div[2]/div/div[8]"
-    )
+                                 "/html/body/div[2]/div[2]/main/div[2]/div/div[2]/form/div[4]/div[2]/div[2]/div/div/div[2]/div/div[8]")
+    js.execute_script("arguments[0].scrollIntoView({block: 'center'});", master)
+    time.sleep(0.7)
     js.execute_script("arguments[0].parentElement.scrollTop = arguments[0].offsetTop;", master)
+    time.sleep(0.5)
     master.click()
+    print("✅ Master sélectionné")
+    time.sleep(1)
 
-    # Conditions
-    driver.find_element(By.XPATH,
-        "//*[@id=\"edit-field-accepte-communications-wrapper\"]/div/label"
-    ).click()
+    # Conditions - SOLUTION ANTI-CHEVAUCHEMENT
+    print("📋 Acceptation des conditions... (anti-chevauchement)")
+
+    # Méthode 1: JavaScript Click (INFALLIBLE)
+    conditions_checkbox = driver.find_element(By.XPATH,
+                                              "//*[@id=\"edit-field-accepte-communications-wrapper\"]/div/label")
+    js.execute_script("arguments[0].checked = true;", conditions_checkbox)
+    js.execute_script("arguments[0].click();", conditions_checkbox)  # Force le clic
+    print("✅ Conditions cochées via JavaScript ✓")
+    time.sleep(1)
 
 
-@then('le bouton creer affiche un message "{message}"')
-def step_then_message(context, message):
-    context.driver.quit()
+@then('je ferme le navigateur')
+def step_then_close_browser(context):
+    print("✅ NAVIGATEUR FERMÉ")
+    if hasattr(context, 'driver') and context.driver:
+        context.driver.quit()
