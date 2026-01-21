@@ -20,13 +20,19 @@ jobs:
         
     - shell: powershell
       run: |
-        pip install -r requirements.txt
+        pip install --upgrade pip
+        pip install behave selenium webdriver-manager behave-html-formatter
         
     - env:
         HEADLESS: true
       shell: powershell
-      run: behave -f html -o report.html
-    
+      run: |
+        # DEBUG : Vérifier structure
+        dir
+        dir features\*.feature
+        # Lancer avec verbose
+        behave --verbose -f html -o report.html
+        
     - uses: actions/upload-artifact@v4
       with:
         name: report-html
