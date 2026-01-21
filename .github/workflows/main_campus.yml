@@ -1,4 +1,4 @@
-name:  CampusFrance Behave Tests
+name: CampusFrance Behave Tests
 
 on:
   push:
@@ -12,40 +12,38 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: 📥 Checkout
+    - name: Checkout
       uses: actions/checkout@v4
       
-    - name: 🐍 Python 3.11
+    - name: Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         
-    - name: 📦 Install deps
+    - name: Install deps
       shell: powershell
       run: |
         pip install --upgrade pip
         pip install behave selenium webdriver-manager behave-html-formatter
         
-    - name: 🔧 Fix Python path
+    - name: Fix Python path
       shell: powershell
       run: |
-        # Ajoute utils/ au PYTHONPATH
         $env:PYTHONPATH = "$env:PYTHONPATH;$PWD\utils"
         Write-Output "PYTHONPATH=$env:PYTHONPATH"
         
-    - name: 🚀 Run Behave + HTML Report
+    - name: Run Behave + HTML Report
       env:
         HEADLESS: true
         PYTHONPATH: "${{ github.workspace }}\utils"
       shell: powershell
       run: |
-        Write-Output "=== DEBUG ==="
+        Write-Output "DEBUG Structure:"
         Get-ChildItem features -Recurse
-        python -c "import sys; print(sys.path)"
         
         behave -f html -o report.html --no-capture --verbose
         
-    - name: 📊 Upload Report
+    - name: Upload Report
       if: always()
       uses: actions/upload-artifact@v4
       with:
