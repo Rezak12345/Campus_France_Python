@@ -1,7 +1,8 @@
-import time
-import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sys
+import time
+# Fix PYTHONPATH pour GitHub Actions
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'utils'))
 from selenium.webdriver.edge.options import Options
 from behave import given, when, then
 from selenium import webdriver
