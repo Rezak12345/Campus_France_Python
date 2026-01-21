@@ -1,8 +1,12 @@
-import os
-import sys
 import time
-# Fix PYTHONPATH pour GitHub Actions
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'utils'))
+import sys
+import os
+
+# 🔧 Ajouter la racine du projet au sys.path pour que 'utils' soit trouvable
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from selenium.webdriver.edge.options import Options
 from behave import given, when, then
 from selenium import webdriver
