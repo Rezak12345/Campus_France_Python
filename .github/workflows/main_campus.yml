@@ -1,4 +1,4 @@
-name: 🧪 CampusFrance Behave Tests
+name:  CampusFrance Behave Tests
 
 on:
   push:
