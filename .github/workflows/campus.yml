@@ -2,7 +2,7 @@ name: CampusFrance Behave Tests
 
 on:
   push:
-    branches: [ main]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -30,16 +30,22 @@ jobs:
           pip install -r requirements.txt
           pip install behave selenium webdriver-manager behave-html-formatter
 
-      # 4️⃣ Exécuter Behave avec Edge headless et logs complets
+      # 4️⃣ Exécuter Behave avec Edge headless et logs UTF-8
       - name: Run Behave on Creation_etudiant.feature
         shell: powershell
         env:
           HEADLESS: true
+          PYTHONUTF8: 1   # force UTF-8 dans Python
         run: |
-          Write-Output "=== Exécution du test Behave pour Creation_etudiant.feature en mode headless Edge ==="
+          # Forcer UTF-8 dans la console PowerShell
+          $OutputEncoding = [System.Text.Encoding]::UTF8
+          
+          Write-Output "=== Exécution du test Behave en mode headless Edge ==="
+          
           # Rapport HTML
           behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v 
-          # Log texte complet (trace des exceptions Python)
+          
+          # Log texte complet avec exceptions Python
           behave features/Creation_etudiant.feature -f plain -o report.txt --no-capture -v 
 
       # 5️⃣ Upload du rapport HTML
@@ -50,7 +56,7 @@ jobs:
           name: behave-html-report
           path: report.html
 
-      # 6️⃣ Upload du log texte complet
+      # 6️⃣ Upload du log texte
       - name: Upload Behave Log
         if: always()
         uses: actions/upload-artifact@v4
