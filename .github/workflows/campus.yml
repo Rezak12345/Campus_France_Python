@@ -35,7 +35,6 @@ jobs:
     - name: Run Behave + HTML Report
       env:
         HEADLESS: true
-        PYTHONPATH: "${{ github.workspace }}\utils"
       shell: powershell
       run: |
         Write-Output "DEBUG Structure:"
