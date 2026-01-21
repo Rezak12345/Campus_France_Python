@@ -1,3 +1,4 @@
 behave
-selenium  
+selenium
 webdriver-manager
+behave-html-formatter
