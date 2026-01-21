@@ -37,7 +37,7 @@ jobs:
           Write-Output "Structure du projet :"
           Get-ChildItem -Recurse
 
-      # 5️⃣ Lancer Behave sur le fichier feature spécifique + HTML report
+      # 5️⃣ Lancer Behave sur Creation_etudiant.feature avec headless + HTML report
       - name: Run Behave on Creation_etudiant.feature
         shell: powershell
         env:
