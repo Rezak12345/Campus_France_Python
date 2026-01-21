@@ -37,14 +37,14 @@ jobs:
           Write-Output "Structure du projet :"
           Get-ChildItem -Recurse
 
-      # 5️⃣ Lancer Behave depuis la racine + HTML report
-      - name: Run Behave + HTML Report
+      # 5️⃣ Lancer Behave sur le fichier feature spécifique + HTML report
+      - name: Run Behave on Creation_etudiant.feature
         shell: powershell
         env:
           HEADLESS: true
         run: |
-          Write-Output "Exécution des tests Behave depuis la racine en mode headless"
-          behave -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v
+          Write-Output "Exécution du test Behave pour Creation_etudiant.feature en mode headless"
+          behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v
 
       # 6️⃣ Upload du rapport HTML
       - name: Upload HTML Report
