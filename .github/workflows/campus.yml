@@ -12,17 +12,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # Checkout du code
+      # 1️⃣ Checkout du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Python
+      # 2️⃣ Setup Python
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # Installer les dépendances
+      # 3️⃣ Installer les dépendances
       - name: Install dependencies
         shell: powershell
         run: |
@@ -30,24 +30,23 @@ jobs:
           pip install -r requirements.txt
           pip install behave selenium webdriver-manager behave-html-formatter
 
-      # Vérifier la structure du dossier features
-      - name: List features folder
+      # 4️⃣ Vérifier la structure du projet
+      - name: List project files
         shell: powershell
         run: |
-          Write-Output "Structure du dossier features :"
-          Get-ChildItem features -Recurse
+          Write-Output "Structure du projet :"
+          Get-ChildItem -Recurse
 
-      # Lancer les tests Behave headless + HTML report
+      # 5️⃣ Lancer Behave depuis la racine + HTML report
       - name: Run Behave + HTML Report
         shell: powershell
         env:
           HEADLESS: true
         run: |
-          Write-Output "Exécution des tests Behave en mode headless"
-          # Lancer explicitement sur le dossier features
-          behave features/ -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v
+          Write-Output "Exécution des tests Behave depuis la racine en mode headless"
+          behave -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v
 
-      # Upload du rapport HTML
+      # 6️⃣ Upload du rapport HTML
       - name: Upload HTML Report
         if: always()
         uses: actions/upload-artifact@v4
