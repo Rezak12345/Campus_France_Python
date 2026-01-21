@@ -3,10 +3,12 @@ pipeline {
 
     environment {
         HEADLESS = 'true'
+        PYTHONUTF8 = '1'  // Force Python en UTF-8
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout SCM') {
             steps {
                 checkout scm
             }
@@ -24,7 +26,6 @@ pipeline {
             steps {
                 powershell """
                     pip install -r requirements.txt
-                    pip install behave selenium webdriver-manager behave-html-formatter
                 """
             }
         }
@@ -41,6 +42,9 @@ pipeline {
         stage('Run Behave Test') {
             steps {
                 powershell """
+                    chcp 65001  # UTF-8 console
+                    $OutputEncoding = [System.Text.Encoding]::UTF8
+
                     Write-Output "Exécution du test Behave pour Creation_etudiant.feature en mode headless"
                     behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v
                 """
@@ -58,6 +62,7 @@ pipeline {
         always {
             powershell """
                 Write-Output "Nettoyage éventuel du navigateur Selenium..."
+                # Ici tu peux ajouter du code pour fermer le driver si nécessaire
             """
         }
     }
