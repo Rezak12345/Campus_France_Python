@@ -7,45 +7,41 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  behave-tests:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Récupérer le dépôt
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # 3️⃣ Installer les dépendances Python
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install selenium behave
 
-      # 4️⃣ Installer Microsoft Edge Browser
-      - name: Setup Edge Browser
-        uses: browser-actions/setup-edge@v1
-        with:
-          edge-version: "stable"
+      - name: Download Microsoft EdgeDriver
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri "https://msedgedriver.microsoft.com/LATEST_RELEASE" -OutFile version.txt
+          $ver = Get-Content version.txt
+          Write-Host "Downloading EdgeDriver version $ver"
+          Invoke-WebRequest -Uri "https://msedgedriver.microsoft.com/${ver}/edgedriver_win64.zip" -OutFile driver.zip
+          Expand-Archive driver.zip -DestinationPath edgedriver
 
-      # 5️⃣ Installer Edge WebDriver (msedgedriver)
-      - name: Setup Edge WebDriver
-        uses: browser-actions/setup-edge@v1
-        with:
-          edge-version: "stable"
+      - name: Add EdgeDriver to PATH
+        run: |
+          echo "##[add-path]$PWD/edgedriver" 
 
-      # 6️⃣ Exécuter les tests Behave + créer rapport HTML
-      - name: Run Behave Tests
+      - name: Run Behave tests
         run: |
           mkdir reports
           behave -f html -o reports/report.html
 
-      # 7️⃣ Upload du rapport HTML en tant qu'artefact
       - name: Upload test report
         uses: actions/upload-artifact@v4
         with:
