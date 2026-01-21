@@ -1,8 +1,8 @@
-name: 🧪 CampusFrance Behave Tests
+name: 🧪 CampusFrance Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -12,28 +12,22 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: 📥 Checkout
-      uses: actions/checkout@v4
-      
-    - name: 🐍 Python
-      uses: actions/setup-python@v5
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         
-    - name: 📦 Dependencies
-      shell: powershell
+    - shell: powershell
       run: |
-        pip install --upgrade pip
         pip install -r requirements.txt
         
-    - name: 🚀 BEHAVE + HTML Report
-      env:
+    - env:
         HEADLESS: true
       shell: powershell
       run: behave -f html -o report.html
-        
-    - name: 📊 Upload Report
-      uses: actions/upload-artifact@v4
+    
+    - uses: actions/upload-artifact@v4
       with:
         name: report-html
         path: report.html
