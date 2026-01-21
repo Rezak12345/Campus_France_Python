@@ -2,7 +2,7 @@ name: CampusFrance Behave Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -30,13 +30,6 @@ jobs:
           pip install -r requirements.txt
           pip install behave selenium webdriver-manager behave-html-formatter
 
-      # 4️⃣ Vérifier la structure du projet
-      - name: List project files
-        shell: powershell
-        run: |
-          Write-Output "Structure du projet :"
-          Get-ChildItem -Recurse
-
       # 5️⃣ Exécuter Behave avec headless Edge et logs
       - name: Run Behave on Creation_etudiant.feature
         shell: powershell
@@ -46,8 +39,6 @@ jobs:
           Write-Output "=== Exécution du test Behave pour Creation_etudiant.feature en mode headless Edge ==="
           # Rapport HTML
           behave features/Creation_etudiant.feature -f behave_html_formatter:HTMLFormatter -o report.html --no-capture -v 
-          # Log texte complet
-          behave features/Creation_etudiant.feature -f plain -o report.txt --no-capture -v 
       # 6️⃣ Upload du rapport HTML
       - name: Upload HTML Report
         if: always()
@@ -56,10 +47,3 @@ jobs:
           name: behave-html-report
           path: report.html
 
-      # 7️⃣ Upload du log texte
-      - name: Upload Behave Log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: behave-log
-          path: report.txt
